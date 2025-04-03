@@ -50,6 +50,7 @@
     "@epic-web/totp": "^4.0.1",
     "@mjackson/form-data-parser": "^0.7.0",
     "@mjackson/headers": "^0.10.0",
+    "@modelcontextprotocol/sdk": "^1.8.0",
     "@nasa-gcn/remix-seo": "^2.0.1",
     "@nichtsam/helmet": "0.3.0",
     "@oslojs/crypto": "^1.0.1",
