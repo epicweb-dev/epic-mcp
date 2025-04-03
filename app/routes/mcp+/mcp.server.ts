@@ -40,6 +40,11 @@ server.tool(
 				})
 			}
 		}
+		if (!content.length) {
+			return {
+				content: [{ type: 'text', text: 'No users found' }],
+			}
+		}
 
 		return { content }
 	},
