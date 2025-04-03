@@ -18,7 +18,7 @@ dockerfile = "/other/Dockerfile"
 ignorefile = "/other/Dockerfile.dockerignore"
 
 [[services]]
-internal_port = 8_080
+internal_port = 8080
 processes = [ "app" ]
 protocol = "tcp"
 script_checks = [ ]
@@ -54,8 +54,8 @@ script_checks = [ ]
   headers = { }
 
   [[services.http_checks]]
-  grace_period = "10s"
-  interval = "30s"
-  method = "GET"
-  timeout = "5s"
-  path = "/litefs/health"
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/litefs/health"

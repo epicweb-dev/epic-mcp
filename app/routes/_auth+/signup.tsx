@@ -138,14 +138,14 @@ export default function SignupRoute({ actionData }: Route.ComponentProps) {
 	})
 
 	return (
-		<div className="container flex flex-col justify-center pb-32 pt-20">
+		<div className="container flex flex-col justify-center pt-20 pb-32">
 			<div className="text-center">
 				<h1 className="text-h1">Let's start your journey!</h1>
-				<p className="mt-3 text-body-md text-muted-foreground">
+				<p className="text-body-md text-muted-foreground mt-3">
 					Please enter your email.
 				</p>
 			</div>
-			<div className="mx-auto mt-16 min-w-full max-w-sm sm:min-w-[368px]">
+			<div className="mx-auto mt-16 max-w-sm min-w-full sm:min-w-[368px]">
 				<Form method="POST" {...getFormProps(form)}>
 					<HoneypotInputs />
 					<Field
@@ -170,7 +170,7 @@ export default function SignupRoute({ actionData }: Route.ComponentProps) {
 						Submit
 					</StatusButton>
 				</Form>
-				<ul className="mt-5 flex flex-col gap-5 border-b-2 border-t-2 border-border py-3">
+				<ul className="border-border mt-5 flex flex-col gap-5 border-t-2 border-b-2 py-3">
 					{providerNames.map((providerName) => (
 						<li key={providerName}>
 							<ProviderConnectionForm
