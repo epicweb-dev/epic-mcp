@@ -20,6 +20,7 @@ export const server = new McpServer(
 
 server.tool(
 	'Find User',
+	'Search for users in the Epic Notes database by their name or username',
 	{ query: z.string().describe('The query to search for') },
 	async ({ query }) => {
 		const like = `%${query ?? ''}%`

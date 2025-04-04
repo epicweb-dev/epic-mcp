@@ -1,3 +1,4 @@
+import { invariantResponse } from '@epic-web/invariant'
 import { type Route } from './+types/index.ts'
 import { connect, getTransport } from './mcp.server.ts'
 
@@ -11,12 +12,10 @@ export async function loader({ request }: Route.LoaderArgs) {
 export async function action({ request }: Route.ActionArgs) {
 	const url = new URL(request.url)
 	const sessionId = url.searchParams.get('sessionId')
-	if (!sessionId) {
-		return new Response('No session ID', { status: 400 })
-	}
+	invariantResponse(sessionId, 'No session ID')
+
 	const transport = await getTransport(sessionId)
-	if (!transport) {
-		return new Response('Not found', { status: 404 })
-	}
+	invariantResponse(transport, 'No transport', { status: 404 })
+
 	return transport.handlePostMessage(request)
 }

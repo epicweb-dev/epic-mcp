@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto'
+// maybe this'll get built-into the SDK: https://github.com/modelcontextprotocol/typescript-sdk/issues/260
 import { type Transport } from '@modelcontextprotocol/sdk/shared/transport.js'
 import {
 	type JSONRPCMessage,
@@ -24,7 +24,7 @@ export class FetchSSEServerTransport implements Transport {
 	 */
 	constructor(endpoint: string, sessionId?: string | null) {
 		this.#endpoint = endpoint
-		this.#sessionId = sessionId ?? randomUUID()
+		this.#sessionId = sessionId ?? crypto.randomUUID()
 	}
 
 	/**
