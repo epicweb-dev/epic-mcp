@@ -1,54 +1,117 @@
-<div align="center">
-  <h1 align="center"><a href="https://www.epicweb.dev/epic-stack">The Epic Stack 🚀</a></h1>
-  <strong align="center">
-    Ditch analysis paralysis and start shipping Epic Web apps.
-  </strong>
-  <p>
-    This is an opinionated project starter and reference that allows teams to
-    ship their ideas to production faster and on a more stable foundation based
-    on the experience of <a href="https://kentcdodds.com">Kent C. Dodds</a> and
-    <a href="https://github.com/epicweb-dev/epic-stack/graphs/contributors">contributors</a>.
-  </p>
-</div>
+# Epic MCP
 
-```sh
-npx create-epic-app@latest
+An [Epic Stack](https://github.com/epicweb-dev/epic-stack) example adding
+support for the Model Context Protocol (MCP).
+
+## What is MCP?
+
+The Model Context Protocol (MCP) is an open protocol that standardizes how
+applications provide context to Large Language Models (LLMs). Think of MCP like
+a USB-C port for AI applications - it provides a standardized way to connect AI
+models to different data sources and tools.
+
+Learn more from the
+[MCP Documentation](https://modelcontextprotocol.io/introduction)
+
+## Example Implementation
+
+This repository demonstrates how to integrate MCP into an Epic Stack
+application. The implementation includes:
+
+1. Server-side MCP setup for handling client connections
+2. SSE (Server-Sent Events) transport layer for real-time communication
+3. Example tool implementations showing how to expose functionality to LLMs
+
+### Key Components
+
+#### 1. MCP Server Setup (`app/routes/mcp+/mcp.server.ts`)
+
+```ts
+export const server = new McpServer(
+	{
+		name: 'epic-mcp-a25d',
+		version: '1.0.0',
+	},
+	{
+		capabilities: {
+			tools: {},
+		},
+	},
+)
 ```
 
-[![The Epic Stack](https://github-production-user-asset-6210df.s3.amazonaws.com/1500684/246885449-1b00286c-aa3d-44b2-9ef2-04f694eb3592.png)](https://www.epicweb.dev/epic-stack)
+The MCP server is the core component that handles tool registration and
+execution. It's configured with a unique name and version, and defines the
+capabilities it provides.
 
-[The Epic Stack](https://www.epicweb.dev/epic-stack)
+#### 2. Tool Implementation
 
-<hr />
+```ts
+server.tool(
+	'Find User',
+	'Search for users in the Epic Notes database by their name or username',
+	{ query: z.string().describe('The query to search for') },
+	async ({ query }) => {
+		// Implementation...
+	},
+)
+```
 
-## Watch Kent's Introduction to The Epic Stack
+Tools are the primary way to expose functionality to LLMs. Each tool:
 
-[![Epic Stack Talk slide showing Flynn Rider with knives, the text "I've been around and I've got opinions" and Kent speaking in the corner](https://github-production-user-asset-6210df.s3.amazonaws.com/1500684/277818553-47158e68-4efc-43ae-a477-9d1670d4217d.png)](https://www.epicweb.dev/talks/the-epic-stack)
+- Has a descriptive name and purpose
+- Uses Zod for type-safe parameter validation
+- Can return multiple content types (text, images, etc.)
+- Integrates with your existing application logic
 
-["The Epic Stack" by Kent C. Dodds](https://www.epicweb.dev/talks/the-epic-stack)
+#### 3. Transport Layer (`app/routes/mcp+/fetch-transport.server.ts`)
 
-## Docs
+The transport layer handles the bi-directional communication between the MCP
+client and server:
 
-[Read the docs](https://github.com/epicweb-dev/epic-stack/blob/main/docs)
-(please 🙏).
+- Uses Server-Sent Events (SSE) for real-time server-to-client communication
+- Handles POST requests for client-to-server messages
+- Maintains session state for multiple concurrent connections
 
-## Support
+#### 4. Route Integration (`app/routes/mcp+/index.ts`)
 
-- 🆘 Join the
-  [discussion on GitHub](https://github.com/epicweb-dev/epic-stack/discussions)
-  and the [KCD Community on Discord](https://kcd.im/discord).
-- 💡 Create an
-  [idea discussion](https://github.com/epicweb-dev/epic-stack/discussions/new?category=ideas)
-  for suggestions.
-- 🐛 Open a [GitHub issue](https://github.com/epicweb-dev/epic-stack/issues) to
-  report a bug.
+```ts
+export async function loader({ request }: Route.LoaderArgs) {
+	const url = new URL(request.url)
+	const sessionId = url.searchParams.get('sessionId')
+	const transport = await connect(sessionId)
+	return transport.handleSSERequest(request)
+}
+```
 
-## Branding
+The Remix route:
 
-Want to talk about the Epic Stack in a blog post or talk? Great! Here are some
-assets you can use in your material:
-[EpicWeb.dev/brand](https://epicweb.dev/brand)
+- Establishes SSE connections for real-time communication
+- Handles incoming tool requests via POST endpoints
+- Manages session state for multiple clients
 
-## Thanks
+### Learning Points
 
-You rock 🪨
+1. **Tool Design**: When designing tools for LLMs:
+
+   - Provide clear, descriptive names and purposes
+   - Use strong type validation for parameters
+   - Return structured responses that LLMs can understand
+   - Consider supporting multiple content types (text, images, etc.)
+
+2. **State Management**: The implementation demonstrates:
+
+   - Session-based connection tracking
+   - Clean connection cleanup on client disconnect
+   - Safe concurrent client handling
+
+3. **Integration Patterns**: Learn how to:
+
+   - Connect MCP with existing application logic
+   - Handle real-time communication in Remix
+   - Structure your MCP implementation for maintainability
+
+4. **Security Considerations**:
+   - Session-based access control
+   - Safe handling of client connections
+   - Proper cleanup of resources
