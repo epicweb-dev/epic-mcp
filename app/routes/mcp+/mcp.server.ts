@@ -19,7 +19,7 @@ export const server = new McpServer(
 )
 
 server.tool(
-	'Find User',
+	'find_user',
 	'Search for users in the Epic Notes database by their name or username',
 	{ query: z.string().describe('The query to search for') },
 	async ({ query }) => {
@@ -48,6 +48,49 @@ server.tool(
 		}
 
 		return { content }
+	},
+)
+
+server.tool(
+	'get_user_notes',
+	'Get the notes for a user',
+	{
+		username: z.string().describe('The username of the user to get notes for'),
+	},
+	async ({ username }) => {
+		const user = await prisma.user.findUnique({
+			where: { username },
+			select: {
+				notes: {
+					select: {
+						id: true,
+						title: true,
+						content: true,
+					},
+					take: 10,
+				},
+			},
+		})
+		if (!user) {
+			return {
+				content: [{ type: 'text', text: 'User not found' }],
+			}
+		}
+
+		const { notes } = user
+
+		if (!notes?.length) {
+			return {
+				content: [{ type: 'text', text: 'No notes found' }],
+			}
+		}
+
+		return {
+			content: notes.map((note) => ({
+				type: 'text',
+				text: `${note.title}\n\n${note.content}`,
+			})),
+		}
 	},
 )
 
